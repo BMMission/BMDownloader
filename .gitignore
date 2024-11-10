@@ -1,0 +1,6 @@
+
+Cargo.lock
+*.db
+/target
+/node.js/node_modules
+*.so

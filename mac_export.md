@@ -14,10 +14,11 @@ Check Installed Targets: To check the available targets, you can run:
 bash
 
     rustup target list
-    
+
 Install Apple SDK with these code(you can update SDK version by checking repo):
 
 bash
+
     wget https://github.com/roblabla/MacOSX-SDKs/releases/download/macosx14.0/MacOSX14.0.sdk.tar.xz 
     tar -xf MacOSX14.0.sdk.tar.xz 
     export SDKROOT=$(pwd)/MacOSX14.0.sdk/

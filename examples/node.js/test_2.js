@@ -4,7 +4,7 @@ import {
     getDownloads,
     getFileInfo,
     readyToDownloadQueue
-} from './downloader.js';
+} from './downloader.cjs';
 
 changeDownloaderFolder("C:\\Users\\wizif\\Downloads");
 console.log(getFileInfo(15,"ddd.rar"))

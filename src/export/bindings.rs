@@ -51,7 +51,15 @@ pub extern "C" fn get_downloads_c(limits: c_int, sort_by: *const c_char) -> *con
 }
 
 #[no_mangle]
-pub extern "C" fn add_new_download_c(url: *const c_char, output_path: *const c_char) -> c_int {
+pub extern "C" fn add_new_download_c(
+    url: *const c_char, 
+    output_path: *const c_char, 
+    types: *const c_char, 
+    version: *const c_char, 
+    category: *const c_char, 
+    divise: *const c_char
+) -> c_int {
+    // Convert the C-style strings to Rust strings
     let url_str = unsafe {
         assert!(!url.is_null());
         CStr::from_ptr(url).to_string_lossy().into_owned()
@@ -62,7 +70,38 @@ pub extern "C" fn add_new_download_c(url: *const c_char, output_path: *const c_c
         CStr::from_ptr(output_path).to_string_lossy().into_owned()
     };
 
-    downloader::add_new_download(&url_str, &output_path_str)
+    let types_str = unsafe {
+        assert!(!types.is_null());
+        CStr::from_ptr(types).to_string_lossy().into_owned()
+    };
+
+    let version_str = unsafe {
+        assert!(!version.is_null());
+        CStr::from_ptr(version).to_string_lossy().into_owned()
+    };
+
+    let category_str = unsafe {
+        assert!(!category.is_null());
+        CStr::from_ptr(category).to_string_lossy().into_owned()
+    };
+
+    let divise_str = unsafe {
+        assert!(!divise.is_null());
+        CStr::from_ptr(divise).to_string_lossy().into_owned()
+    };
+
+    // Now call the Rust function with the extracted parameters
+    let result = downloader::add_new_download(
+        &url_str, 
+        &output_path_str, 
+        &types_str, 
+        &version_str, 
+        &category_str, 
+        &divise_str
+    );
+
+    // Return the result as an integer (return type c_int)
+    result
 }
 
 #[no_mangle]

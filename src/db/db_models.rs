@@ -2,6 +2,7 @@ use crate::db::db_connection::get_sqlite;
 use crate::sql_c;
 use serde::Serialize;
 
+
 #[derive(Serialize, serde::Deserialize, Debug)]
 pub struct Downloads {
     pub id: Option<i32>,
@@ -9,19 +10,28 @@ pub struct Downloads {
     pub output: String,
     pub url: String,
     pub file_size: u64,
+    pub types: String,    
+    pub version: String, 
+    pub category: String,
+    pub divise: String,   
 }
 impl Downloads {
-    pub fn new(id: Option<i32>, status: i32, output: String, url: String, file_size: u64) -> Self {
+    pub fn new(id: Option<i32>, status: i32, output: String, url: String, file_size: u64, types: String, version: String, category: String, divise: String) -> Self {
         Self {
             id,
             status,
             output,
             url,
             file_size,
+            types,
+            version,
+            category,
+            divise,
         }
     }
+
     pub fn blank() -> Self {
-        Downloads::new(Some(0), 0, 0.to_string(), 0.to_string(), 0)
+        Downloads::new(Some(0), 0, "".to_string(), "".to_string(), 0, "".to_string(), "".to_string(), "".to_string(), "".to_string())
     }
     pub fn get_download_with_status_and_name(&self) -> Self {
         sql_c!(sqlite);
@@ -44,6 +54,10 @@ WHERE output='{}' LIMIT 1;
                     row.get(2).unwrap(),
                     row.get(3).unwrap(),
                     row.get(4).unwrap(),
+                    row.get(5).unwrap(),
+                    row.get(6).unwrap(),
+                    row.get(7).unwrap(),
+                    row.get(8).unwrap(),
                 ))
             })
             .unwrap();

@@ -1,14 +1,16 @@
-import ffi from 'ffi-napi';
-import ref from 'ref-napi';
 
-// Define the C types you'll use
+// dont change this to deprecated ffi this is a patch lib
+var ffi = require('@2060.io/ffi-napi');
+var ref = require('@2060.io/ref-napi');
+const path = require('path');
 const cStringPtr = ref.refType(ref.types.char);
 const cInt = ref.types.int;
+let downloader_plugin_liib = process.platform === "linux"  ? "libbmdownloader.so" :
+                            (process.platform === "darwin" ? "libbmdownloader.dylib" : "bmdownloader.dll");
 
-// Load the Rust shared library
-const rustLib = ffi.Library('./bmdownloader.dll', {
+const rustLib = ffi.Library(path.join(__dirname, downloader_plugin_liib), {
     'get_downloads_c': [cStringPtr, [cInt, cStringPtr]],
-    'add_new_download_c': [cInt, [cStringPtr, cStringPtr]],
+    'add_new_download_c': [cInt, [cStringPtr, cStringPtr, cStringPtr, cStringPtr, cStringPtr]], 
     'ready_to_download_queue_c': [ref.types.bool, [cInt]],
     'is_data_exists_c': [ref.types.bool, [cStringPtr]],
     'pause_download_by_id_c': ['void', [cInt]],
@@ -26,10 +28,13 @@ const rustLib = ffi.Library('./bmdownloader.dll', {
     'start_background_downloader_service_c': ['void', []],
     'free_c_string': ['void', [cStringPtr]]
 });
-export function stringToBuffer(str) {
+
+stringToBuffer = (str) => {
     return Buffer.from(str);
 }
-export function getDownloads(limits, sortBy) {
+
+// Exported functions
+exports.getDownloads = (limits, sortBy) => {
     const sortByCStr = Buffer.from(sortBy);
     const resultPtr = rustLib.get_downloads_c(limits, sortByCStr);
     const result = JSON.parse(resultPtr.readCString());
@@ -37,29 +42,35 @@ export function getDownloads(limits, sortBy) {
     return result;
 }
 
-export function addNewDownload(url, outputPath) {
+exports.addNewDownload = (url, outputPath, types, version, category, divise) => {
+
     const urlCStr = stringToBuffer(url);
     const outputPathCStr = stringToBuffer(outputPath);
-    return rustLib.add_new_download_c(urlCStr, outputPathCStr);
+    const typesCStr = stringToBuffer(types);       
+    const versionCStr = stringToBuffer(version);   
+    const categoryCStr = stringToBuffer(category); 
+    const diviseCStr = stringToBuffer(divise);      
+
+    return rustLib.add_new_download_c(urlCStr, outputPathCStr, typesCStr, versionCStr, categoryCStr, diviseCStr);
 }
 
-export function readyToDownloadQueue(id) {
+exports.readyToDownloadQueue = (id) => {
     return rustLib.ready_to_download_queue_c(id);
 }
 
-export function pauseDownloadById(id) {
+exports.pauseDownloadById = (id) => {
     rustLib.pause_download_by_id_c(id);
 }
 
-export function getFileInfo(id, outputPath) {
+exports.getFileInfo = (id, outputPath) => {
     const outputPathCStr = stringToBuffer(outputPath);
     const resultPtr = rustLib.get_file_info_c(id, outputPathCStr);
-    const result =JSON.parse(resultPtr.readCString());
+    const result = JSON.parse(resultPtr.readCString());
     rustLib.free_c_string(resultPtr);
     return result;
 }
 
-export function getSchedules(limits, sortBy) {
+exports.getSchedules = (limits, sortBy) => {
     const sortByCStr = stringToBuffer(sortBy);
     const resultPtr = rustLib.get_schedules_c(limits, sortByCStr);
     const result = JSON.parse(resultPtr.readCString());
@@ -67,27 +78,27 @@ export function getSchedules(limits, sortBy) {
     return result;
 }
 
-export function addNewSchedules(downloadId, time, etime, day) {
+exports.addNewSchedules = (downloadId, time, etime, day) => {
     const timeCStr = stringToBuffer(time);
     const etimeCStr = stringToBuffer(etime);
     const dayCStr = stringToBuffer(day);
     return rustLib.add_new_schedules_c(downloadId, timeCStr, etimeCStr, dayCStr);
 }
 
-export function activeCurrentSchedules() {
+exports.activeCurrentSchedules = () => {
     const resultPtr = rustLib.active_current_schedules_c();
     const result = resultPtr.readCString();
     rustLib.free_c_string(resultPtr);
     return result;
 }
 
-export function updateSetting(key, value) {
+exports.updateSetting = (key, value) => {
     const keyCStr = stringToBuffer(key);
     const valueCStr = stringToBuffer(value);
     rustLib.update_setting_c(keyCStr, valueCStr);
 }
 
-export function getSetting(key) {
+exports.getSetting = (key) => {
     const keyCStr = stringToBuffer(key);
     const resultPtr = rustLib.get_setting_c(keyCStr);
     const result = resultPtr.readCString();
@@ -95,36 +106,38 @@ export function getSetting(key) {
     return result;
 }
 
-export function getDownloaderStatus() {
+exports.getDownloaderStatus = () => {
     const resultPtr = rustLib.get_downloader_status_c();
     const result = resultPtr.readCString();
     rustLib.free_c_string(resultPtr);
     return result;
 }
 
-export function turnDownloaderStatus() {
+exports.turnDownloaderStatus = () => {
     const resultPtr = rustLib.turn_downloader_status_c();
     const result = resultPtr.readCString();
     rustLib.free_c_string(resultPtr);
     return result;
 }
-export function changeDownloaderFolder(download_path) {
-    
+
+exports.changeDownloaderFolder = (download_path) => {
     const download_pathCStr = stringToBuffer(download_path);
     rustLib.change_download_folder_c(download_pathCStr);
 }
-export function isDataExists(download_path) {
-    
+
+exports.isDataExists = (download_path) => {
     const download_pathCStr = stringToBuffer(download_path);
-    rustLib.is_data_exists_c(download_pathCStr);
+    return rustLib.is_data_exists_c(download_pathCStr);
 }
-export function firstDataInitialize() {
+
+exports.firstDataInitialize = () => {
     rustLib.init_db_c();
 }
 
-export function stopBackgroundDownloaderService() {
+exports.stopBackgroundDownloaderService = () => {
     rustLib.stop_background_downloader_service_c();
 }
-export function startBackgroundDownloaderService(){
+
+exports.startBackgroundDownloaderService = () => {
     rustLib.start_background_downloader_service_c();
 }

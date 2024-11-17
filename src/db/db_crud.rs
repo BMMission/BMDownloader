@@ -9,19 +9,28 @@ impl CRUD for Downloads {
         sql_c!(sqlite);
         sqlite.execute(&format!(
             "
-        INSERT INTO downloads (id, status, output, url, file_size)
-VALUES (NULL, {}, '{}', '{}', {});
-        ",
-            self.status, self.output, self.url, self.file_size
+            INSERT INTO downloads (status, output, url, file_size, types, version, category, divise)
+            VALUES ({}, '{}', '{}', {}, '{}', '{}', '{}', '{}');
+            ",
+            self.status,
+            self.output,
+            self.url,
+            self.file_size,
+            self.types,
+            self.version,
+            self.category,
+            self.divise
         ));
+
         let mut get_id = sqlite
             .conn
             .prepare(&format!(
                 "
-        SELECT id
-FROM downloads
-WHERE output = '{}' AND status=0 LIMIT 1;
-        ",
+                SELECT id
+                FROM downloads
+                WHERE output = '{}' AND status = 0
+                LIMIT 1;
+                ",
                 self.output
             ))
             .unwrap();
@@ -50,11 +59,17 @@ WHERE output = '{}' AND status=0 LIMIT 1;
             .expect("an error occured on running sql commands maybe wrong column");
         let all_ids: Result<Vec<Downloads>, rusqlite::Error> = get_id
             .query_map([], |row| {
-                Ok(Downloads::new( row.get(0).unwrap(),
-                row.get(1).unwrap(),
-                row.get(2).unwrap(),
-                row.get(3).unwrap(),
-                row.get(4).unwrap(),))
+                Ok(Downloads::new(
+                    row.get(0).unwrap(),
+                    row.get(1).unwrap(),
+                    row.get(2).unwrap(),
+                    row.get(3).unwrap(),
+                    row.get(4).unwrap(),
+                    row.get(5).unwrap(),
+                    row.get(6).unwrap(),
+                    row.get(7).unwrap(),
+                    row.get(8).unwrap(),
+                ))
             })
             .unwrap()
             .collect();
@@ -94,10 +109,10 @@ WHERE output = '{}' AND status=0 LIMIT 1;
             .conn
             .prepare(&format!(
                 "
-        SELECT *
-FROM downloads
-WHERE id = {} LIMIT 1;
-        ",
+                SELECT id, status, output, url, file_size, types, version, category, divise
+                FROM downloads
+                WHERE id = {} LIMIT 1;
+                ",
                 id
             ))
             .unwrap();
@@ -109,15 +124,16 @@ WHERE id = {} LIMIT 1;
                     row.get(2).unwrap(),
                     row.get(3).unwrap(),
                     row.get(4).unwrap(),
+                    row.get(5).unwrap(),
+                    row.get(6).unwrap(),
+                    row.get(7).unwrap(),
+                    row.get(8).unwrap(),
                 ))
             });
-            match all_ids {
-                Ok(_) =>all_ids.unwrap(),
-                Err(err) => {
-                    println!("cant unwrap :{}",err);
-                    Downloads::blank()
-                },
-            }
+        match all_ids {
+            Ok(download) => download,
+            Err(_) => Downloads::blank(),
+        }
     }
 }
 

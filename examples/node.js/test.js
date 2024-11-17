@@ -1,20 +1,11 @@
-import {
-    changeDownloaderFolder,
-    firstDataInitialize,
-    addNewSchedules,
-    addNewDownload,
-    startBackgroundDownloaderService,
-    readyToDownloadQueue,
-    getDownloads,
-    getDownloaderStatus
-} from './downloader.js';
+import * as downloader from './downloader.cjs';
 
 
 
 // changeDownloaderFolder("/home/wizif/projects/oh_well");
-changeDownloaderFolder("C:\\Users\\wizif\\Downloads");
-// firstDataInitialize();
-startBackgroundDownloaderService()
+downloader.changeDownloaderFolder("/home/wizif/projects/oh_well/");
+downloader.firstDataInitialize();
+downloader.startBackgroundDownloaderService()
 // addNewDownload("https://sample-videos.com/video321/mp4/720/big_buck_bunny_720p_2mb.mp4","big_buck_bunny_720p_2mb.mp4")
 // addNewDownload("https://sample-videos.com/video321/mp4/720/big_buck_bunny_720p_2mb.mp4","big_buck_bunny_720p_2mb_2.mp4")
 // addNewDownload("https://sample-videos.com/video321/mp4/720/big_buck_bunny_720p_2mb.mp4","big_buck_bunny_720p_2mb_3.mp4")

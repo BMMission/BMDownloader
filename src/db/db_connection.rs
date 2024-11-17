@@ -38,15 +38,20 @@ impl sql_operations {
         }
     }
     pub fn init_db(&self) {
-        let sql_db = "CREATE TABLE downloads (
-                                        id	INTEGER NOT NULL,
-                                        status	INTEGER NOT NULL DEFAULT 0,
-                                        output	TEXT NOT NULL,
-                                        url	TEXT NOT NULL,
-                                        file_size	NUMERIC NOT NULL,
-                                        PRIMARY KEY(id)
-                                    );";
-        self.execute(sql_db);
+        let sql_db = "
+            CREATE TABLE downloads (
+                id INTEGER NOT NULL PRIMARY KEY,
+                status INTEGER NOT NULL DEFAULT 0,
+                output TEXT NOT NULL,
+                url TEXT NOT NULL,
+                file_size NUMERIC NOT NULL,
+                types TEXT NOT NULL,      
+                version TEXT NOT NULL,    
+                category TEXT NOT NULL,   
+                divise TEXT NOT NULL      
+            );
+            ";
+self.execute(sql_db);
         let sql_db="CREATE TABLE schedules (
                                         id	INTEGER NOT NULL,
                                         download_id	INTEGER NOT NULL,
@@ -72,7 +77,7 @@ impl sql_operations {
         self.execute(sql_db);
         let sql_db="
                                     INSERT INTO settings (id, name, value)
-                                    VALUES (NULL, 'schedule_status', '0');
+                                    VALUES (NULL, 'schedule_status', '1');
                                     ";
         self.execute(sql_db);
         

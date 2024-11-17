@@ -45,7 +45,7 @@ mod tests {
     
     #[doc = "test readall_downloads into db"]
     fn test_1_layer__readall_downloads(){
-        let download: Downloads=Downloads::new(None, 0, String::new(), String::new(), 0);
+        let download = Downloads::new(None, 0, "file.txt".to_string(), "https://example.com/file".to_string(), 1000, "type1".to_string(), "1.0".to_string(), "category1".to_string(), "divise1".to_string());
         download.readall::<Downloads>(0,"id");
 
      }
@@ -53,22 +53,22 @@ mod tests {
     
     #[doc = "test insert_downloads into db"]
     fn test_1_layer__insert_downloads(){
-        let download=Downloads::new(None, 0, "test_1_layer__insert_downloads.txt".to_owned(), "google.com".to_owned(), 11);
+        let download = Downloads::new(None, 0, "file.txt".to_string(), "https://example.com/file".to_string(), 1000, "type1".to_string(), "1.0".to_string(), "category1".to_string(), "divise1".to_string());
         download.create::<Downloads>();
      }
      #[test]
      
     #[doc = "test read_by_id_downloads from db"]
     fn test_1_layer__read_by_id_downloads(){
-        let download: Downloads=Downloads::new(None ,0, String::new(), String::new(), 0);
-        
+        let download = Downloads::blank();
+        let mut download: Downloads = download.read_by_id::<Downloads>(1);
      }
      #[test]
      
     #[doc = "test update_downloads into db"]
     fn test_1_layer__update_downloads(){
-        let download: Downloads=Downloads::new(None ,1, String::new(), String::new(), 0);
-        let mut download: Downloads = download.read_by_id::<Downloads>(2);
+        let download = Downloads::blank();
+        let mut download: Downloads = download.read_by_id::<Downloads>(1);
         download.output="testcase output update".to_string();
      }
      #[test]

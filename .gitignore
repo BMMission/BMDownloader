@@ -4,3 +4,4 @@ Cargo.lock
 /target
 /node.js/node_modules
 *.so
+/examples/node.js/node_modules

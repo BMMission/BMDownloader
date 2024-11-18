@@ -11,7 +11,10 @@ let downloader_plugin_liib = process.platform === "linux"  ? "libbmdownloader.so
 const rustLib = ffi.Library(path.join(__dirname, downloader_plugin_liib), {
     'get_downloads_c': [cStringPtr, [cInt, cStringPtr]],
     'add_new_download_c': [cInt, [cStringPtr, cStringPtr, cStringPtr, cStringPtr, cStringPtr]], 
+    'add_new_download_general_c':[cInt,[cStringPtr, cStringPtr,]],
     'ready_to_download_queue_c': [ref.types.bool, [cInt]],
+    'remove_download_by_id_c': [ref.types.bool, [cInt]],
+    'remove_schedule_by_id_c': [ref.types.bool, [cInt]],
     'is_data_exists_c': [ref.types.bool, [cStringPtr]],
     'pause_download_by_id_c': ['void', [cInt]],
     'get_file_info_c': [cStringPtr, [cInt, cStringPtr]],
@@ -25,21 +28,36 @@ const rustLib = ffi.Library(path.join(__dirname, downloader_plugin_liib), {
     'change_download_folder_c': ['void', [cStringPtr]],
     'init_db_c': ['void', []],
     'stop_background_downloader_service_c': ['void', []],
+    'default_folder_c': ['void', []],
     'start_background_downloader_service_c': ['void', []],
     'free_c_string': ['void', [cStringPtr]]
 });
 
 stringToBuffer = (str) => {
-    return Buffer.from(str);
+    const buffered=Buffer.from(str);
+    console.log(str)
+    console.log(buffered.length,str.length)
+    // return buffered
+    if (str.length.toString() === buffered.length.toString()){
+        return buffered
+    }else{
+        stringToBuffer(str)
+    }
 }
 
 // Exported functions
 exports.getDownloads = (limits, sortBy) => {
-    const sortByCStr = Buffer.from(sortBy);
-    const resultPtr = rustLib.get_downloads_c(limits, sortByCStr);
-    const result = JSON.parse(resultPtr.readCString());
-    rustLib.free_c_string(resultPtr);
-    return result;
+    
+    try {
+        const sortByCStr =stringToBuffer(sortBy);
+        const resultPtr = rustLib.get_downloads_c(limits, sortByCStr);
+        const result = JSON.parse(resultPtr.readCString());
+        rustLib.free_c_string(resultPtr);
+        return result;
+    } catch (error) {
+        this.getDownloads(limits,sortBy)
+    }
+    
 }
 
 exports.addNewDownload = (url, outputPath, types, version, category, divise) => {
@@ -53,11 +71,21 @@ exports.addNewDownload = (url, outputPath, types, version, category, divise) => 
 
     return rustLib.add_new_download_c(urlCStr, outputPathCStr, typesCStr, versionCStr, categoryCStr, diviseCStr);
 }
+exports.addNewGeneralDownload = (url,outputPath) =>{
+    const urlCStr = stringToBuffer(url);
+    const outputPathCStr = stringToBuffer(outputPath);
+    return rustLib.add_new_download_general_c(urlCStr, outputPathCStr);
 
+}
 exports.readyToDownloadQueue = (id) => {
     return rustLib.ready_to_download_queue_c(id);
 }
-
+exports.removeDownloadByID = (id) => {
+    return rustLib.remove_download_by_id_c(id);
+}
+exports.removeScheduleByID = (id) => {
+    return rustLib.remove_download_by_id_c(id);
+}
 exports.pauseDownloadById = (id) => {
     rustLib.pause_download_by_id_c(id);
 }
@@ -137,7 +165,9 @@ exports.firstDataInitialize = () => {
 exports.stopBackgroundDownloaderService = () => {
     rustLib.stop_background_downloader_service_c();
 }
-
+exports.defaultDownloader = () => {
+    rustLib.default_folder_c();
+}
 exports.startBackgroundDownloaderService = () => {
     rustLib.start_background_downloader_service_c();
 }

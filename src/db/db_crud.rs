@@ -99,8 +99,51 @@ impl CRUD for Downloads {
         self.read_by_id::<Downloads>(self.id.unwrap())
     }
 
-    fn delete<T>(&self, id: T) -> Self {
-        todo!()
+    fn delete<T>(&self, id: i32) -> Self {
+        sql_c!(sqlite);
+        let mut get_id = sqlite
+            .conn
+            .prepare(&format!(
+                "
+                SELECT *
+                FROM downloads
+                WHERE id = {:?} LIMIT 1;
+                ",
+                id
+            ))
+            .unwrap();
+        let id = get_id
+            .query_row([], |row| {
+                Ok(Downloads::new(
+                    row.get(0).unwrap(),
+                    row.get(1).unwrap(),
+                    row.get(2).unwrap(),
+                    row.get(3).unwrap(),
+                    row.get(4).unwrap(),
+                    row.get(5).unwrap(),
+                    row.get(6).unwrap(),
+                    row.get(7).unwrap(),
+                    row.get(8).unwrap(),
+                ))
+            });
+        match id {
+                Ok(mut download) => {
+                    let _ = sqlite
+                    .execute(&format!(
+                        "
+                         DELETE FROM downloads
+                        WHERE id = {};
+                        ",
+                        download.id.unwrap()
+                    ));
+                    eprint!("deleted");
+                    download
+                },
+                Err(error) => {
+                    eprint!("something went wrong cant delete,=>\n {:?}",error);
+                    Downloads::blank()
+                },
+            }
     }
 
     fn read_by_id<T>(&self, id: i32) -> Self {
@@ -218,9 +261,49 @@ LIMIT 1;
             .unwrap();
         self.read_by_id::<Schedules>(self.id)
     }
-
-    fn delete<T>(&self, id: T) -> Schedules {
-        todo!()
+    fn delete<T>(&self, id: i32) -> Schedules {
+        sql_c!(sqlite);
+        let mut get_id = sqlite
+            .conn
+            .prepare(&format!(
+                "
+                SELECT *
+                FROM schedules
+                WHERE id = {:?} LIMIT 1;
+                ",
+                id
+            ))
+            .unwrap();
+        let id = get_id
+            .query_row([], |row| {
+                Ok(Schedules::new(
+                    row.get(0).unwrap(),
+                    row.get(1).unwrap(),
+                    row.get(2).unwrap(),
+                    row.get(3).unwrap(),
+                    row.get(4).unwrap(),
+                ))
+            });
+        match id {
+                Ok(schedule) => {
+                    sqlite
+                    .conn
+                    .prepare(&format!(
+                        "
+                         DELETE FROM schedules
+                        WHERE id = {};
+                        ",
+                        schedule.id
+                    ))
+                    .unwrap();
+                    eprint!("deleted");
+                    schedule
+                },
+                Err(error) => {
+                    eprint!("something went wrong cant delete,=>\n {:?}",error);
+                    Schedules::blank()
+                },
+            }
     }
 
     fn read_by_id<T>(&self, id: i32) -> Schedules {
@@ -332,7 +415,7 @@ LIMIT 1;
         self.read_by_id::<Settings>(self.id)
     }
 
-    fn delete<T>(&self, id: T) -> Settings {
+    fn delete<T>(&self, id: i32) -> Settings {
         todo!()
     }
 

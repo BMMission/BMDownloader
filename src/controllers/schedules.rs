@@ -42,3 +42,11 @@ pub fn active_current_schedules()->String{
 
     String::from("")
 }
+pub fn remove_schedule_by_id(id:i32)->bool{
+    let schedule = Schedules::blank();
+    let schedule = schedule.delete::<Schedules>(id);
+    if schedule.id == 0{
+        return false;
+    }
+    true
+}

@@ -1,5 +1,5 @@
 use crate::components::downloader::{self, DownloadFile};
-use crate::db::db_models::{Downloads, CRUD};
+use crate::db::db_models::{Downloads, Schedules, CRUD};
 use std::collections::HashMap;
 use std::fs::metadata;
 use std::path::Path;
@@ -85,12 +85,14 @@ pub fn get_file_info(id: i32, output_path: &str) -> HashMap<String, String> {
     file_info.insert("downloaded".to_string(), file_size.to_string());
     file_info.insert("size".to_string(), new_downloader.file_size.to_string());
     file_info.insert("progress".to_string(), progress.to_string());
-
-    // Include the new fields in the response (if needed)
-    file_info.insert("types".to_string(), new_downloader.types);
-    file_info.insert("version".to_string(), new_downloader.version);
-    file_info.insert("category".to_string(), new_downloader.category);
-    file_info.insert("divise".to_string(), new_downloader.divise);
-
     file_info
+}
+pub fn remove_download_by_id(id:i32)->bool{
+    let download = Downloads::blank();
+    let download = download.delete::<Downloads>(id);
+    if download.id == Some(0){
+        return false;
+    }
+    true
+
 }

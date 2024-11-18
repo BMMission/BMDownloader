@@ -197,5 +197,5 @@ pub trait CRUD {
         Self: Sized;
     fn read_by_id<T>(&self, id: i32) -> Self;
     fn update<T>(&self) -> Self;
-    fn delete<T>(&self, id: T) -> Self;
+    fn delete<T>(&self, id: i32) -> Self;
 }

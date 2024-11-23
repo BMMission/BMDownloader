@@ -86,9 +86,6 @@ impl DownloadFile {
 
             // Write chunk to file
             let _ = file_ptr.write_all(&chunk);
-    
-            // Calculate and display progress
-            let progress = (downloaded as f64 / total_size as f64) * 100.0;
         }
         blank.status=3;
         blank.update::<Downloads>();
@@ -96,13 +93,22 @@ impl DownloadFile {
     }
     pub async fn get_total_size(&self)->u64{
         let client = Client::new();
-        let response = client.get(&self.url).send().await.expect("maybe wrong url for downloader file");
-        let headers=response.headers();
-        // Check for content length
-        let total_size = headers.get(CONTENT_LENGTH)
-            .and_then(|value| value.to_str().ok())
-            .and_then(|value| value.parse::<u64>().ok())
-            .unwrap_or(0);
-        total_size
+        let response = client.get(&self.url).send().await;
+        match response {
+            Ok(response_checked) => {
+                let headers=response_checked.headers();
+                // Check for content length
+                let total_size = headers.get(CONTENT_LENGTH)
+                    .and_then(|value| value.to_str().ok())
+                    .and_then(|value| value.parse::<u64>().ok())
+                    .unwrap_or(0);
+                total_size
+            },
+            Err(error) => {
+                eprint!("a network connection problem occured=>\n{:?}",error);
+                return 0;
+            },
+        }
+
     }
 }

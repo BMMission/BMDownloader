@@ -78,9 +78,23 @@ self.execute(sql_db);
         let sql_db="
                                     INSERT INTO settings (id, name, value)
                                     VALUES (NULL, 'schedule_status', '1');
-                                    ";
+                                    ";     
         self.execute(sql_db);
-        
+        let sql_db="
+                                    INSERT INTO settings (id, name, value)
+                                    VALUES (NULL, 'schedule_status', '1');
+                                    ";     
+        self.execute(sql_db);
+        let sql_db="
+                                    INSERT INTO settings (id, name, value)
+                                    VALUES (NULL, 'schedule_start_hour', '1');
+                                    ";     
+        self.execute(sql_db);
+        let sql_db="
+        INSERT INTO settings (id, name, value)
+        VALUES (NULL, 'schedule_end_hour', '7');
+        ";     
+        self.execute(sql_db);
     }
 }
 

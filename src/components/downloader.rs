@@ -47,7 +47,17 @@ impl DownloadFile {
         }
         println!("{}", downloaded);
         let client = Client::new();
-        let response = client.get(&self.url).header(RANGE,format!("bytes={:?}-",downloaded)).send().await.unwrap();
+        let mut response_raw = client.get(&self.url).header(RANGE,format!("bytes={:?}-",downloaded)).send().await;
+        match response_raw {
+            Ok(raw_response) => {
+                response_raw=Ok(raw_response);
+            },
+            Err(error) => {
+                println!("some thing went wrong in downloading \n {:?}",error);
+                return Err(Box::new(io::Error::new(io::ErrorKind::Interrupted, "cant download anything")))
+            },
+        }
+        let response = response_raw.unwrap();
         let headers=response.headers();
         // Check for content length
         let total_size = headers.get(CONTENT_LENGTH)

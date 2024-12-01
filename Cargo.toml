@@ -7,7 +7,7 @@ edition = "2021"
 crate-type = ["cdylib"]
 
 [dependencies]
-reqwest = { version = "0.12.8", features = ["blocking", "stream"] }
+reqwest = { version = "0.12.8", features = ["stream"] }
 tokio = { version = "1", features = ["full"] }
 futures-util = {version = "0.3.31"}
 rusqlite = { version = "0.32.0", features = ["bundled"] }
@@ -19,8 +19,9 @@ directories = "5.0.1"
 test = { parallel = false }
 
 [profile.release]
-opt-level = 'z'     # Optimize for size
-lto = true          # Enable link-time optimization
-codegen-units = 1   # Reduce number of codegen units to increase optimizations
-panic = 'abort'     # Abort on panic
+opt-level = 'z'    
+lto = true          
+codegen-units = 1   
+panic = 'abort'  
 strip = true 
+link-dead-code = true

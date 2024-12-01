@@ -253,3 +253,7 @@ pub extern  "C" fn start_background_downloader_service_c(){
 pub extern  "C" fn stop_background_downloader_service_c(){
     stop_downloader_service();
 }
+#[no_mangle]
+pub extern  "C" fn remove_completes_c(){
+    downloader::remove_compelete_downloads();
+}

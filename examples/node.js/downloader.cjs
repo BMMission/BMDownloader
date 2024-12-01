@@ -30,6 +30,7 @@ const rustLib = ffi.Library(path.join(__dirname, downloader_plugin_liib), {
     'stop_background_downloader_service_c': ['void', []],
     'default_folder_c': ['void', []],
     'start_background_downloader_service_c': ['void', []],
+    'remove_completes_c':['void',[]],
     'free_c_string': ['void', [cStringPtr]]
 });
 
@@ -170,4 +171,7 @@ exports.defaultDownloader = () => {
 }
 exports.startBackgroundDownloaderService = () => {
     rustLib.start_background_downloader_service_c();
+}
+exports.removeCompletes = ()=>{
+    rustLib.remove_completes_c();
 }

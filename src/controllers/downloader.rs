@@ -96,3 +96,6 @@ pub fn remove_download_by_id(id:i32)->bool{
     true
 
 }
+pub fn remove_compelete_downloads(){
+    Downloads::remove_compelete_downloads();
+}

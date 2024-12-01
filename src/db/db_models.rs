@@ -95,6 +95,14 @@ WHERE status = 1;
             .collect();
         all_ids.unwrap()
     }
+    pub fn remove_compelete_downloads(){
+        sql_c!(sqlite);
+        let mut removed_id = sqlite
+        .execute("
+        DELETE FROM downloads
+        WHERE status = 3;
+        ");
+    }
 }
 #[derive(Serialize, serde::Deserialize, Debug)]
 pub struct Schedules {
